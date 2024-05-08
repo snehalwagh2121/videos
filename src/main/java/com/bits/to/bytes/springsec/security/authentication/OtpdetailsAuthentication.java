@@ -1,6 +1,6 @@
 package com.bits.to.bytes.springsec.security.authentication;
 
-import com.bits.to.bytes.springsec.model.Userdata;
+import com.bits.to.bytes.springsec.model.Otpdetails;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.security.core.Authentication;
@@ -10,15 +10,8 @@ import java.util.Collection;
 
 @Data
 @AllArgsConstructor
-public class UserDetailsAuthentication implements Authentication {
-
-    Userdata userdata;
-    String otp;
-
-    public UserDetailsAuthentication(Userdata userdata){
-        this.userdata= userdata;
-    }
-
+public class OtpdetailsAuthentication implements Authentication {
+    Otpdetails otpdetails;
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return null;
@@ -26,17 +19,17 @@ public class UserDetailsAuthentication implements Authentication {
 
     @Override
     public Object getCredentials() {
-        return userdata.getPassword();
+        return otpdetails.getOtp();
     }
 
     @Override
     public Object getDetails() {
-        return userdata.getRole();
+        return null;
     }
 
     @Override
     public Object getPrincipal() {
-        return userdata.getUsername();
+        return otpdetails.getUsername();
     }
 
     @Override
@@ -51,6 +44,6 @@ public class UserDetailsAuthentication implements Authentication {
 
     @Override
     public String getName() {
-        return userdata.getUsername();
+        return otpdetails.getUsername();
     }
 }

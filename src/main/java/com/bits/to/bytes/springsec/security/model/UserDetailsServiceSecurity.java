@@ -28,3 +28,4 @@ public class UserDetailsServiceSecurity implements UserDetailsService {
         return UserDataToUserDetailsMapper.convertToUserDetails(userdata.get());
     }
 }
+
