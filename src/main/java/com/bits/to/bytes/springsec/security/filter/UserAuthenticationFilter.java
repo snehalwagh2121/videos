@@ -37,7 +37,6 @@ public class UserAuthenticationFilter extends OncePerRequestFilter {
         }else{
             Authentication authentication= authenticationManager.authenticate(new UserDetailsAuthentication(new Userdata(username, password, null)));
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            response.setHeader("otp", ((UserDetailsAuthentication)authentication).getOtp());
             return;
         }
 
