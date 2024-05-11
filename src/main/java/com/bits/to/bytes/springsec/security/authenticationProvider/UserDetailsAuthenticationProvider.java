@@ -4,6 +4,7 @@ import com.bits.to.bytes.springsec.model.Otpdetails;
 import com.bits.to.bytes.springsec.repository.OtpdetailsRepository;
 import com.bits.to.bytes.springsec.security.authentication.UserDetailsAuthentication;
 import com.bits.to.bytes.springsec.security.model.UserDetailsServiceSecurity;
+import com.bits.to.bytes.springsec.security.util.JwtUtil;
 import com.twilio.rest.api.v2010.account.Message;
 import com.twilio.type.PhoneNumber;
 import lombok.extern.slf4j.Slf4j;
@@ -19,27 +20,32 @@ import org.springframework.stereotype.Component;
 public class UserDetailsAuthenticationProvider implements AuthenticationProvider {
     UserDetailsServiceSecurity userDetailsServiceSecurity;
     OtpdetailsRepository otpdetailsRepository;
+    JwtUtil jwtUtil;
 
     @Value("${phone.number}")
     String mobileNumber;
-    public UserDetailsAuthenticationProvider(UserDetailsServiceSecurity userDetailsServiceSecurity, OtpdetailsRepository otpdetailsRepository){
+    public UserDetailsAuthenticationProvider(UserDetailsServiceSecurity userDetailsServiceSecurity, OtpdetailsRepository otpdetailsRepository, JwtUtil jwtUtil){
         this.userDetailsServiceSecurity= userDetailsServiceSecurity;
         this.otpdetailsRepository= otpdetailsRepository;
+        this.jwtUtil= jwtUtil;
+
     }
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         log.info("Authenticating user details");
         UserDetails userDetails= userDetailsServiceSecurity.loadUserByUsername(authentication.getName());
         if(authentication.getCredentials().equals(userDetails.getPassword())){
-            String otp= String.valueOf(Math.random()).substring(2, 8);
-//            UserDetailsAuthentication userDetailsAuthentication= (UserDetailsAuthentication) authentication;
-//            userDetailsAuthentication.setOtp(otp);
+            String token = jwtUtil.generateJwtToken(userDetails);
+            log.info("token: "+token);
+//            String otp= String.valueOf(Math.random()).substring(2, 8);
+            UserDetailsAuthentication userDetailsAuthentication= (UserDetailsAuthentication) authentication;
+            userDetailsAuthentication.setToken(token);
 
             //send otp to user's mobile number
-            Message.creator(new PhoneNumber(mobileNumber),
-                    new PhoneNumber("+14582910713"), "Hi, the otp for signin is : "+otp).create();
-            otpdetailsRepository.save(new Otpdetails(authentication.getName(), otp));
-            return authentication;
+//            Message.creator(new PhoneNumber(mobileNumber),
+//                    new PhoneNumber("+14582910713"), "Hi, the otp for signin is : "+otp).create();
+//            otpdetailsRepository.save(new Otpdetails(authentication.getName(), otp));
+            return userDetailsAuthentication;
         }
         throw new RuntimeException("Invalid Username/password ");
     }

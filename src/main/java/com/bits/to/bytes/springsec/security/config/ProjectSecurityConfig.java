@@ -1,5 +1,6 @@
 package com.bits.to.bytes.springsec.security.config;
 
+import com.bits.to.bytes.springsec.security.authenticationProvider.JwtAuthenticationProvider;
 import com.bits.to.bytes.springsec.security.authenticationProvider.OtpdetailsAuthenticationProvider;
 import com.bits.to.bytes.springsec.security.authenticationProvider.UserDetailsAuthenticationProvider;
 import com.bits.to.bytes.springsec.security.filter.UserAuthenticationFilter;
@@ -17,10 +18,14 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 public class ProjectSecurityConfig {
     UserDetailsAuthenticationProvider userDetailsAuthenticationProvider;
     OtpdetailsAuthenticationProvider otpdetailsAuthenticationProvider;
+    JwtAuthenticationProvider jwtAuthenticationProvider;
 
-    public ProjectSecurityConfig(UserDetailsAuthenticationProvider userDetailsAuthenticationProvider, OtpdetailsAuthenticationProvider otpdetailsAuthenticationProvider){
+    public ProjectSecurityConfig(UserDetailsAuthenticationProvider userDetailsAuthenticationProvider,
+                                 OtpdetailsAuthenticationProvider otpdetailsAuthenticationProvider,
+                                 JwtAuthenticationProvider jwt){
         this.userDetailsAuthenticationProvider= userDetailsAuthenticationProvider;
         this.otpdetailsAuthenticationProvider= otpdetailsAuthenticationProvider;
+        this.jwtAuthenticationProvider= jwt;
     }
 
     @Bean
@@ -33,6 +38,7 @@ public class ProjectSecurityConfig {
         AuthenticationManagerBuilder authenticationManagerBuilder= httpSecurity.getSharedObject(AuthenticationManagerBuilder.class);
         authenticationManagerBuilder.authenticationProvider(userDetailsAuthenticationProvider);
         authenticationManagerBuilder.authenticationProvider(otpdetailsAuthenticationProvider);
+        authenticationManagerBuilder.authenticationProvider(jwtAuthenticationProvider);
         return authenticationManagerBuilder.build();
     }
 
